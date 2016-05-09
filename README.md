@@ -87,5 +87,9 @@ The command-line for providing notifications of torrent downloads. The notificat
 For example, notifications can be posted to the Notification Center on OS X by using `terminal-notifier`:
 
     notifier = /usr/bin/terminal-notifier -title ShowRSS -message
+    
+If you prefer Growl, you can set the command to use `growlnotify`:
 
-showrss is available under the MIT license. See the LICENSE file for more info.
+    notifier = /usr/local/bin/growlnotify --title Adding item from ShowRSS --appIcon /Applications/Transmission.app --message
+
+`newshowrss` is available under the MIT license. See the LICENSE file for more info.
