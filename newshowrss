@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+
+import subprocess
+import ConfigParser
+import md5
+import syslog
+import os.path
+
+import feedparser
+
+PREFERENCE_KEYS = (
+    'user_id',
+    'magnets',
+    'namespaces',
+    'name',
+    'quality',
+    're'
+)
+
+def log(level, message, console=True):
+    if console:
+        print message.encode('utf-8', 'ignore')
+    syslog.syslog(level, message.encode('utf-8', 'ignore'))
+
+# Settings.
+configfile = os.path.expanduser("~/.newshowrss")
+config = ConfigParser.ConfigParser()
+config.read(configfile)
+preferences = dict((key, config.get('default', key)) for key in PREFERENCE_KEYS)
+command = config.get("default", "command").split(" ")
+notifier = None
+try:
+    notifier = config.get("default", "notifier").split(" ")
+except:
+    pass
+
+# Load the optional quality flag
+preferences['quality'] = "default"
+try:
+    preferences['quality'] = config.get("default", "quality")
+except:
+    pass
+if not preferences['quality'] in {"default", "standard", "high", "all"}:
+    exit("Unknown quality setting '{}'.\nMust be one of 'default', 'standard', 'high' or 'all'.".format(preferences['quality']))
+
+# Logging.
+log(syslog.LOG_INFO, "Checking for new shows", False)
+
+# Load the cache.
+cachefile = os.path.expanduser("~/.newshowrss_cache")
+cache = ConfigParser.ConfigParser()
+cache.read(cachefile)
+
+# Generate the URL.
+url = "http://showrss.info/user/{user_id}.rss?magnets={magnets}&namespaces={namespaces}&name={name}&quality={quality}&re={re}".format(**preferences)
+
+# Fetch the feed.
+feed = feedparser.parse(url)
+
+# Ensure there's a section in the cache.
+try:
+    cache.add_section("entries")
+except:
+    pass
+    
+shows = []
+
+for item in feed['items']:
+    title = item['title']
+    identifier = item['id']
+    key = md5.new(identifier).hexdigest()
+    torrent = item['links'][0]['href']
+    try:
+        cache.get("entries", key)
+    except:
+        log(syslog.LOG_INFO, "Downloading '{}'...".format(title))
+        if (notifier):
+            subprocess.check_call(notifier + [title.encode('utf-8', 'ignore')])
+        try:
+            cache.set("entries", key, "1")
+            subprocess.check_call(command + [torrent])
+            with open(cachefile, 'w+') as outputfile:
+                cache.write(outputfile)
+                outputfile.close()
+                shows.append(title)
+        except Exception as e:
+            log(syslog.LOG_INFO, "Unable to download '%s'" % torrent)
