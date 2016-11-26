@@ -42,9 +42,8 @@ try:
 except:
     pass
 if not preferences['quality'] in QUALITY_SETTINGS:
-    message = "Unknown quality setting '{}'.\nMust be one of"
-    message += "'{}'".format("' '".join(QUALITY_SETTINGS))
-    exit(message.format(preferences['quality']))
+    message = "Unknown quality setting '{}'.\nMust be one of '{}'"
+    exit(message.format(preferences['quality'], "' '".join(QUALITY_SETTINGS)))
 
 log(syslog.LOG_INFO, 'Checking for new shows', False)
 
