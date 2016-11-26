@@ -27,7 +27,7 @@ def log(level, message, console=True):
 configfile = expanduser('~/.newshowrss')
 config = ConfigParser.ConfigParser()
 config.read(configfile)
-preferences = dict((key, config.get('default', key)) for key in PREFERENCE_KEYS)
+preferences = {key : config.get('default', key) for key in PREFERENCE_KEYS}
 command = config.get('default', 'command').split(" ")
 notifier = None
 try:
