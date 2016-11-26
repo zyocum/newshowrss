@@ -42,11 +42,15 @@ Configuration
     [default]
     
     user_id = 12345
-    command = transmission-remote -a
-    notifier = /usr/bin/terminal-notifier -title ShowRSS -message
+    magnets = True
+    namespaces = True
+    name = Clean
+    re = None
+    command = open /Applications/Transmission.app
+    notifier = /usr/local/bin/growlnotify --title Adding item from ShowRSS --appIcon /Applications/Transmission.app --message
     quality = default
 
-The configuration file defines two things:
+The configuration file defines several things:
 
 ### user_id
 
@@ -57,6 +61,25 @@ You can find this by clicking on the 'feeds' link and generating a personal feed
     http://showrss.info/rss.php?user_id=12345&hd=null&proper=null
 
 Your user_id is the value after `user_id=`. `12345` in this example.
+
+### magnets
+
+- `True` - Use magnet links
+- `False` - Use .torrent files
+
+### namespaces
+
+- `True` Include feed namespaces (required for Catch)
+- `False` Don't include feed namepsaces (generic option)
+
+### name
+
+- `Clean` - Clean episode names (feed reader)
+- `Raw` - Raw episode names (torrent client)
+
+### re
+
+Regex for processing episode names (you can set this to `None` if you don't care for this option).
 
 ### command
 
