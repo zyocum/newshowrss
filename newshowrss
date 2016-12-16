@@ -55,10 +55,10 @@ cache.read(CACHEFILE)
 # Generate the URL.
 URL = 'http://showrss.info/user/{user_id}.rss?' + '&'.join([
     'magnets={magnets}',
-    '&namespaces={namespaces}',
-    '&name={name}',
-    '&quality={quality}',
-    '&re={re}'
+    'namespaces={namespaces}',
+    'name={name}',
+    'quality={quality}',
+    're={re}'
 ])
 
 # Fetch the feed.
